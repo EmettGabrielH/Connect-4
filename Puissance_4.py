@@ -36,7 +36,7 @@ def joueur_tour():
             x = int(stdin.readline()) - 1
         except:
             x = -1
-        if poser_jeton(x,JOUEUR,HAUTEUR,TABLEAU):
+        if poser_jeton(x,JOUEUR,HAUTEUR,TABLEAU) != (False,False):
             # Poser un jeton en x
             ERREUR = False
     
