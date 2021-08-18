@@ -1,18 +1,19 @@
 from sys import stdin,stdout
 from copy import deepcopy
 
-global deltas_inf,positions,DIM_X,DIM_Y, JOUEUR, IA,INF, DEPTH,NB_COUPS
+global deltas_inf,positions,DIM_X,DIM_Y, JOUEUR, IA,INF, DEPTH,NB_COUPS,GRILLE_SCORE
 DIM_X, DIM_Y = 7, 6
 JOUEUR, IA,VIDE = "X", "O", " "
 INF = float('inf')
 NB_COUPS = DIM_X * DIM_Y
-DEPTH = 5
+DEPTH = 6
 deltas = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
 deltas_inf = [(-1,-1), (0,-1), (1,-1), (1,0)]
 positions = [(x,y) for y in range(DIM_Y) for x in range(DIM_X)]
 
 # Scores:
-WIN = 42*7
+GRILLE_SCORE = [(3,4,5,5,4,3),(4,6,8,8,6,4),(5,8,11,11,8,5),(7,10,13,13,10,7),(5,8,11,11,8,5),(4,6,8,8,6,4),(3,4,5,5,4,3)]
+WIN = 42*100
 
 def libre_pos(x, hauteur):
     return (0 <= x < DIM_X and hauteur[x] < DIM_Y)
@@ -56,6 +57,16 @@ def game_over(tableau,hauteur):
 def evaluate_score(joueur,tableau):
     # Evaluer la situation
     score = 0
+    non_joueur = IA if joueur == IA else JOUEUR
+    for x, y in positions:
+        if tableau[x][y] == joueur :
+            score += GRILLE_SCORE[x][y]
+    return score
+
+def evaluate_score2(joueur,tableau):
+    # Evaluer la situation
+    score = 0
+    non_joueur = IA if joueur == IA else JOUEUR
     for x, y in positions:
         if tableau[x][y] == VIDE or tableau[x][y] == joueur:
             for d_x,d_y in deltas_inf:
@@ -66,10 +77,10 @@ def evaluate_score(joueur,tableau):
                     bonus += 1
                     if valide_pos(n_x,n_y) and tableau[x][y] == joueur:
                         nb_jeton_ok += 1
-                    if not(valide_pos(n_x,n_y) and (tableau[x][y] == VIDE or tableau[x][y] == joueur)):
+                    if not(valide_pos(n_x,n_y) and tableau[x][y] != non_joueur):
                         break
                 if nb_jeton_ok >= 2 and bonus>= 4:
-                    score += bonus
+                    score += nb_jeton_ok*2 + bonus
     return score 
 def best_mouv(tableau,hauteur):
     # Trouvez le meilleur mouvement
@@ -87,7 +98,7 @@ def best_mouv(tableau,hauteur):
     
 def minimax(tableau,hauteur,depth, alpha, beta,ia):
     # Evaluer le mouvement
-    #print(tableau,depth)
+    
     # Match gagnant
     if test_win(tableau) == IA:
         return WIN * depth
