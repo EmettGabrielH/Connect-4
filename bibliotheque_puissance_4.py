@@ -6,7 +6,7 @@ DIM_X, DIM_Y = 7, 6
 JOUEUR, IA,VIDE = "X", "O", " "
 INF = float('inf')
 NB_CASES = DIM_X * DIM_Y
-DEPTH = 8
+DEPTH = 9
 deltas_inf = [(-1,-1), (0,-1), (1,-1), (1,0)]
 deltas_sup = [(1,1), (0,1), (-1,1), (-1,0)]
 
@@ -78,13 +78,14 @@ def evaluate_score(joueur,tableau):
 
 def best_mouv(tableau,hauteur):
     # Trouvez le meilleur mouvement
+    global tour
     tour = sum(hauteur)
     best_score = -INF
     for x in possibilites:
         if libre_pos(x, hauteur):
             tableau[x][hauteur[x]] = IA
             hauteur[x] += 1
-            score = minimax(x,tableau,hauteur,tour,DEPTH, -INF, INF,False)
+            score = minimax(x,tableau,hauteur,DEPTH, -INF, INF,evaluate_score(IA, tableau),False)
             hauteur[x] -= 1
             tableau[x][hauteur[x]] = VIDE
             
@@ -94,7 +95,7 @@ def best_mouv(tableau,hauteur):
     print(best+1, best_score)
     return best
     
-def minimax(x,tableau,hauteur,tour,depth, alpha, beta,ia):
+def minimax(x,tableau,hauteur,depth, alpha, beta,valeur,ia):
     # Evaluer le mouvement
     
     # Coup gagnant
@@ -104,10 +105,10 @@ def minimax(x,tableau,hauteur,tour,depth, alpha, beta,ia):
 
     #Profondeur maximale
     if depth == 0:
-        return evaluate_score(IA, tableau)
+        return valeur
     
     # Match nul
-    if tour == NB_CASES:
+    if tour-depth+DEPTH == NB_CASES:
         return 0
     
     if ia:
@@ -116,7 +117,8 @@ def minimax(x,tableau,hauteur,tour,depth, alpha, beta,ia):
             if libre_pos(x, hauteur):
                 tableau[x][hauteur[x]] = IA
                 hauteur[x] += 1
-                score = max(score,minimax(x,tableau,hauteur,tour+1,depth - 1, alpha, beta, False))
+                
+                score = max(score,minimax(x,tableau,hauteur,depth - 1, alpha, beta,valeur + GRILLE_SCORE[x][hauteur[x]-1], False))
                 hauteur[x] -= 1
                 tableau[x][hauteur[x]] = VIDE
                 
@@ -131,7 +133,8 @@ def minimax(x,tableau,hauteur,tour,depth, alpha, beta,ia):
             if libre_pos(x, hauteur):
                 tableau[x][hauteur[x]] = JOUEUR
                 hauteur[x] += 1
-                score = min(score,minimax(x,tableau,hauteur,tour+1, depth - 1, alpha, beta, True))
+                
+                score = min(score,minimax(x,tableau,hauteur, depth - 1, alpha, beta,valeur- GRILLE_SCORE[x][hauteur[x]-1], True))
                 hauteur[x] -= 1
                 tableau[x][hauteur[x]] = VIDE
                 
