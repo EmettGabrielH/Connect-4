@@ -6,7 +6,7 @@ DIM_X, DIM_Y = 7, 6
 JOUEUR, IA,VIDE, BORDURE = "X", "O", " ", "#"
 INF = float('inf')
 NB_CASES = DIM_X * DIM_Y
-DEPTH = 8
+DEPTH = 9
 deltas_inf = [(-1,-1), (0,-1), (1,-1), (1,0)]
 deltas_sup = [(1,1), (0,1), (-1,1), (-1,0)]
 
