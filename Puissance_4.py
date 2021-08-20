@@ -6,7 +6,7 @@ def test():
         stdout.write("Victoire du joueur !!!\n")
         return False
     if win == IA:
-        stdout.write("Victoire de l'IA !!!\n")
+        stdout.write("Victoire de l'IA!!!\n")
         return False
     if test_fin(HAUTEUR):
         stdout.write("Match nul !!!\n")
@@ -15,16 +15,16 @@ def test():
 def tour():
     if T == 1:
         joueur_tour()
-        afficher_jeu()
+        afficher_jeu(TABLEAU)
         if test() == False: return False
         ia_tour()
-        afficher_jeu()
+        afficher_jeu(TABLEAU)
     if T == 2:
         ia_tour()
-        afficher_jeu()
+        afficher_jeu(TABLEAU)
         if test() == False: return False
         joueur_tour()
-        afficher_jeu()
+        afficher_jeu(TABLEAU)
     return test()
 
 def joueur_tour():
@@ -48,21 +48,11 @@ def ia_tour():
     hauteur = deepcopy(HAUTEUR)
     x = best_mouv(tableau,hauteur)
     poser_jeton(x,IA,HAUTEUR,TABLEAU)
-
-def afficher_jeu():
-    
-    stdout.write("---------------\n")
-    for y in range(DIM_Y-1,-1,-1):
-        ligne = str(y+1)+" "
-        for x in range(DIM_X):
-            ligne += TABLEAU[x][y] + " "
-        stdout.write("%s\n" %ligne)
-    stdout.write("  1 2 3 4 5 6 7\n")
     
 def main():
-    global TABLEAU,HAUTEUR, T
-    TABLEAU = [[VIDE for y in range(DIM_Y)] for x in range(DIM_X)]
-    HAUTEUR = [0 for x in range(DIM_X)]
+    global TABLEAU,HAUTEUR, T, IA, JOUEUR
+    TABLEAU = [[VIDE for y in range(DIM_Y)]+[BORDURE] for x in range(DIM_X)] + [[BORDURE for _ in range(DIM_X+1)]]
+    HAUTEUR = [0 for x in range(DIM_X+1)]
     
     # Premier au deuxième joueur ?
     stdout.write("Joueur 1 ou 2 ? > ")
@@ -70,9 +60,9 @@ def main():
     while not(T == "1\n" or T == "2\n"):
         T = stdin.readline()
     T = int(T)
-
+    
     # Jeux
-    afficher_jeu()
+    afficher_jeu(TABLEAU)
     while tour():
         pass
     
