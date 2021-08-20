@@ -31,7 +31,7 @@ def joueur_tour():
     ERREUR = True
     # Tour Joueur
     while ERREUR:
-        stdout.write("> ")
+        stdout.write("> \n")
         try : 
             x = int(stdin.readline()) - 1
         except:
@@ -55,7 +55,7 @@ def main():
     HAUTEUR = [0 for x in range(DIM_X+1)]
     
     # Premier au deuxième joueur ?
-    stdout.write("Joueur 1 ou 2 ? > ")
+    stdout.write("Joueur 1 ou 2 ? > \n")
     T = ""
     while not(T == "1\n" or T == "2\n"):
         T = stdin.readline()
