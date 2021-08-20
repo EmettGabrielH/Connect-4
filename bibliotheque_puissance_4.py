@@ -6,7 +6,7 @@ DIM_X, DIM_Y = 7, 6
 JOUEUR, IA,VIDE, BORDURE = "X", "O", " ", "#"
 INF = float('inf')
 NB_CASES = DIM_X * DIM_Y
-DEPTH = 9
+DEPTH = 8
 deltas_inf = [(-1,-1), (0,-1), (1,-1), (1,0)]
 deltas_sup = [(1,1), (0,1), (-1,1), (-1,0)]
 
@@ -22,6 +22,20 @@ def best_mouv(tableau,hauteur):
     # Trouvez le meilleur mouvement
     global tour
     tour = sum(hauteur)
+    print("Tour n°", tour)
+    if tour <= 6:
+        DEPTH = 8
+    else:
+        if max(hauteur) == DIM_Y:
+            if tour <= 10:
+                DEPTH = 9
+            elif tour <= 25:
+                DEPTH = 11
+            elif tour <= 35:
+                DEPTH = 13
+            else:
+                DEPTH = 15
+        
     best_score = -INF
     for x in possibilites:
         y = hauteur[x]
