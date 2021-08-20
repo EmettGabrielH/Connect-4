@@ -14,7 +14,8 @@ positions = [(x,y) for y in range(DIM_Y) for x in range(DIM_X)]
 possibilites = [3,2,4,1,5,0,6]
 
 # Scores:
-GRILLE_SCORE = [(3,4,5,5,4,3),(4,6,8,8,6,4),(5,8,11,11,8,5),(7,10,13,13,10,7),(5,8,11,11,8,5),(4,6,8,8,6,4),(3,4,5,5,4,3)]
+GRILLE_SCORE2 = [(3,4,5,5,4,3),(4,6,8,8,6,4),(5,8,11,11,8,5),(7,10,13,13,10,7),(5,8,11,11,8,5),(4,6,8,8,6,4),(3,4,5,5,4,3)]
+GRILLE_SCORE = [(3/13,4/13,5/13,5/13,4/13,3/13),(4/13,6/13,8/13,8/13,6/13,4/13),(5/13,8/13,11/13,11/13,8/13,5/13),(7/13,10/13,13/13,13/13,10/13,7/13),(5/13,8/13,11/13,11/13,8/13,5/13),(4/13,6/13,8/13,8/13,6/13,4/13),(3/13,4/13,5/13,5/13,4/13,3/13)]
 WIN = 42*100
 
 def best_mouv(tableau,hauteur):
@@ -112,11 +113,10 @@ def test_win_pos(x,y,joueur, tableau):
 
 def evaluate_score_pos(x,y,tableau):
     # Est ce que cette position permet a moi ou l'adversaire d'avoir deux ou trois jetons alignés ?
-    joueur = tableau[x][y]
     score_IA,score_JO = 0, 0
     for d_x,d_y in deltas_inf:
         nb_libre_IA,nb_alignes_IA, continu_IA =1, 1, True
-        nb_libre_JO,nb_alignes_JO,continu_JO = 1, 1, True
+        nb_libre_JO,nb_alignes_JO, continu_JO =1, 1, True
         for op in [1,-1]:
             for i in [1,2,3]:
                 n_x, n_y = x+i*op*d_x, y + i*op*d_y
@@ -124,21 +124,21 @@ def evaluate_score_pos(x,y,tableau):
                     if continu_IA and (tableau[n_x][n_y] == IA or tableau[n_x][n_y] == VIDE):
                         nb_libre_IA += 1
                         if tableau[n_x][n_y] == IA:
-                            nb_alignes_IA += GRILLE_SCORE[n_x][n_y]/13
+                            nb_alignes_IA += GRILLE_SCORE[n_x][n_y]
                     else:
                         continu_IA = False
                     if continu_JO and (tableau[n_x][n_y] == JOUEUR or tableau[n_x][n_y] == VIDE):
                         nb_libre_JO += 1
                         if tableau[n_x][n_y] == JOUEUR:
-                            nb_alignes_JO += GRILLE_SCORE[n_x][n_y]/13
+                            nb_alignes_JO += GRILLE_SCORE[n_x][n_y]
                     else:
                         continu_JO = False
                 else:
                     break
-        if nb_libre_IA >= 4 and nb_alignes_IA >= 2:
-            score_IA = max(nb_alignes_IA,score_IA)
-        if nb_libre_JO >= 4 and nb_alignes_JO >= 2:
-            score_JO = max(nb_alignes_JO,score_JO)
+        if nb_libre_IA >= 4 and nb_alignes_IA >= 2 and nb_alignes_IA > score_IA:
+            score_IA = nb_alignes_IA
+        if nb_libre_JO >= 4 and nb_alignes_JO >= 2 and nb_alignes_JO > score_JO:
+            score_JO = nb_alignes_JO
     return score_IA + score_JO
 
 def evaluate_score(tableau):
