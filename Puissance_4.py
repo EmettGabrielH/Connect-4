@@ -23,16 +23,18 @@ def best_mouv(tableau,hauteur):
     global tour
     tour = sum(hauteur)
     print("Tour n°", tour)
-    if tour <= 3:
-        DEPTH = 7
-    elif tour <= 10:
-        DEPTH = 9
-    elif tour <= 15:
-        DEPTH = 11
-    elif tour <= 25:
-        DEPTH = 13
+    if tour <= 6:
+        DEPTH = 8
     else:
-        DEPTH = 15
+        if max(hauteur) == DIM_Y:
+            if tour <= 10:
+                DEPTH = 9
+            elif tour <= 15:
+                DEPTH = 11
+            elif tour <= 25:
+                DEPTH = 13
+            else:
+                DEPTH = 15
         
     best_score = -INF
     for x in possibilites:
