@@ -44,7 +44,7 @@ def best_mouv(tableau,hauteur):
                 tableau[x][y] = VIDE
             if score > best_score:
                 best_score, best = score, x
-    stdout.write("Coup choisi: "+str(best+1)+" | Score:" +str(best_score))
+    stdout.write("Coup choisi: "+str(best+1)+" | Score:" +str(best_score)+"\n")
     return best
 
 def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
