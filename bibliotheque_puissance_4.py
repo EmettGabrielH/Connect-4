@@ -22,7 +22,7 @@ def best_mouv(tableau,hauteur):
     # Trouvez le meilleur mouvement
     global tour
     tour = sum(hauteur)
-    print("Tour n°", tour)
+    stdout.write("Tour IA n°"+ str(tour)+"\n")
     if tour <= DIM_Y:
         DEPTH = 8
     else:
@@ -39,12 +39,12 @@ def best_mouv(tableau,hauteur):
                 tableau[x][y] = IA
                 hauteur[x] += 1
                 score = minimax(tableau,hauteur,DEPTH, -INF, INF,evaluate_score(tableau),False)
-                print(x+1, score)
+                stdout.write("Reflexion... \n")
                 hauteur[x] -= 1
                 tableau[x][y] = VIDE
             if score > best_score:
                 best_score, best = score, x
-    print(best+1, best_score)
+    stdout.write("Coup choisi: "+str(best+1)+" | Score:" +str(best_score))
     return best
 
 def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
