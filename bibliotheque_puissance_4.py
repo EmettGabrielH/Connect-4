@@ -14,8 +14,9 @@ positions = [(x,y) for y in range(DIM_Y) for x in range(DIM_X)]
 possibilites = [3,2,4,1,5,0,6]
 
 # Scores:
-GRILLE_SCORE2 = [(3,4,5,5,4,3),(4,6,8,8,6,4),(5,8,11,11,8,5),(7,10,13,13,10,7),(5,8,11,11,8,5),(4,6,8,8,6,4),(3,4,5,5,4,3)]
-GRILLE_SCORE = [(3/13,4/13,5/13,5/13,4/13,3/13),(4/13,6/13,8/13,8/13,6/13,4/13),(5/13,8/13,11/13,11/13,8/13,5/13),(7/13,10/13,13/13,13/13,10/13,7/13),(5/13,8/13,11/13,11/13,8/13,5/13),(4/13,6/13,8/13,8/13,6/13,4/13),(3/13,4/13,5/13,5/13,4/13,3/13)]
+GRILLE_SCORE = [[3,4,5,5,4,3],[4,6,8,8,6,4],[5,8,11,11,8,5],[7,10,13,13,10,7],[5,8,11,11,8,5],[4,6,8,8,6,4],[3,4,5,5,4,3]]
+a, m= DEPTH, 13
+for x,y in positions: GRILLE_SCORE[x][y] = (a + GRILLE_SCORE[x][y]/m )/(a+1)
 WIN = 42*100
 
 def best_mouv(tableau,hauteur):
@@ -24,9 +25,9 @@ def best_mouv(tableau,hauteur):
     tour = sum(hauteur)
     stdout.write("Tour IA n°"+ str(tour)+"\n")
     if tour <= DIM_Y:
-        DEPTH = 8
+        depth = DEPTH
     else:
-        DEPTH = 8 + hauteur.count(DIM_Y)
+        depth = DEPTH + hauteur.count(DIM_Y)
         
     best_score = -INF
     for x in possibilites:
@@ -34,11 +35,11 @@ def best_mouv(tableau,hauteur):
         
         if tableau[x][y] == VIDE:
             if test_win_pos(x,y,IA, tableau):
-                score = WIN * DEPTH
+                score = WIN * depth
             else:
                 tableau[x][y] = IA
                 hauteur[x] += 1
-                score = minimax(tableau,hauteur,DEPTH, -INF, INF,evaluate_score(tableau),False)
+                score = minimax(tableau,hauteur,depth, -INF, INF,evaluate_score_pos(x,y,tableau),False)
                 stdout.write("Reflexion... \n")
                 hauteur[x] -= 1
                 tableau[x][y] = VIDE
@@ -141,10 +142,10 @@ def evaluate_score_pos(x,y,tableau):
                         continu_JO = False
                 else:
                     break
-        if nb_libre_IA >= 4 and nb_alignes_IA >= 2 and nb_alignes_IA > score_IA:
-            score_IA = nb_alignes_IA
-        if nb_libre_JO >= 4 and nb_alignes_JO >= 2 and nb_alignes_JO > score_JO:
-            score_JO = nb_alignes_JO
+        if nb_libre_IA >= 4 and nb_alignes_IA > 2 and nb_alignes_IA > score_IA:
+            score_IA = min(3,nb_alignes_IA)
+        if nb_libre_JO >= 4 and nb_alignes_JO > 2 and nb_alignes_JO > score_JO:
+            score_JO = min(3,nb_alignes_JO)
     return score_IA + score_JO
 
 def evaluate_score(tableau):
