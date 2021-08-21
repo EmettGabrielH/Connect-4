@@ -6,7 +6,7 @@ DIM_X, DIM_Y = 7, 6
 JOUEUR, IA,VIDE, BORDURE = "X", "O", " ", "#"
 INF = float('inf')
 NB_CASES = DIM_X * DIM_Y
-DEPTH = 8
+DEPTH = 9
 deltas_inf = [(-1,-1), (0,-1), (1,-1), (1,0)]
 deltas_sup = [(1,1), (0,1), (-1,1), (-1,0)]
 
@@ -15,7 +15,7 @@ possibilites = [3,2,4,1,5,0,6]
 
 # Scores:
 GRILLE_SCORE = [[3,4,5,5,4,3],[4,6,8,8,6,4],[5,8,11,11,8,5],[7,10,13,13,10,7],[5,8,11,11,8,5],[4,6,8,8,6,4],[3,4,5,5,4,3]]
-a, m= DEPTH, 13
+a, m= DEPTH-1, 13
 for x,y in positions: GRILLE_SCORE[x][y] = (a + GRILLE_SCORE[x][y]/m )/(a+1)
 WIN = 42*100
 
@@ -45,7 +45,7 @@ def best_mouv(tableau,hauteur):
                 tableau[x][y] = VIDE
             if score > best_score:
                 best_score, best = score, x
-    stdout.write("Coup choisi: "+str(best+1)+" | Score:" +str(best_score)+"\n")
+    stdout.write("Coup choisi: "+str(best+1)+" \n") #| Score:" +str(best_score)+"\n")
     return best
 
 def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
