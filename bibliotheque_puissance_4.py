@@ -2,32 +2,33 @@ from sys import stdin,stdout
 from copy import deepcopy
 from time import time
 
-global deltas_inf,positions,possibilites,DIM_X,DIM_Y, JOUEUR, IA,INF, DEPTH,NB_CASES,TIME_MIN
+global deltas_inf,positions,possibilites,possibilites2,DIM_X,DIM_Y, JOUEUR, IA,INF, DEPTH,NB_CASES,TIME_MIN,FACTEUR_DEPTH
 DIM_X, DIM_Y = 7, 6
 JOUEUR, IA,VIDE, BORDURE = 'X', 'O', ' ', '#'
 INF = float('inf')
 NB_CASES = DIM_X * DIM_Y
-DEPTH,TIME_MIN = 8, 1.2
+DEPTH,TIME_MIN, FACTEUR_DEPTH = 9, 1.2, 1.6
 deltas_inf = ((-1,-1), (0,-1), (1,-1), (1,0))
 
 positions = tuple((x,y) for y in range(DIM_Y) for x in range(DIM_X))
 possibilites = (3,2,4,1,5,0,6)
+possibilites2 = ((0,1,2,3,4,5,6),(1,0,2,3,4,5,6),(2,1,3,0,4,5,6),(3,2,4,1,5,0,6),(4,3,5,2,6,1,0),(5,4,6,3,2,1,0),(6,5,4,3,2,1,0))
 
 # Scores:
-GRILLE_SCORE = [[3,4,5,5,4,3],[4,6,8,8,6,4],[5,8,11,11,8,5],[7,10,13,13,10,7],[5,8,11,11,8,5],[4,6,8,8,6,4],[3,4,5,5,4,3]]
-LISTE_FACTEURS_PONDERATION = [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-a, m= DEPTH-1, 13
-for x,y in positions: GRILLE_SCORE[x][y] = (a + GRILLE_SCORE[x][y]/m )/(a+1)
-GRILLE_SCORE = tuple(map(tuple, GRILLE_SCORE))
 WIN = 42*100
+
+global OPPOSE,DELTA
+OPPOSE = (-1,1)
+DELTA = (1,2,3)
 
 def best_mouv(tableau,hauteur):
     # Trouvez le meilleur mouvement
-    global tour, debut_tour, FACT_POND_MAX, FACT_POND_MIN
-    tour,debut_tour = sum(hauteur),time()
+    global tour, temps_min
+    
+    debut_tour = time()
+    tour,temps_min = sum(hauteur), debut_tour+TIME_MIN
     stdout.write("Tour IA n°"+ str(tour)+"\n")
-    depth = DEPTH + int(hauteur.count(DIM_Y)*1.6)
-    FACT_POND_MAX,FACT_POND_MIN = 1+LISTE_FACTEURS_PONDERATION[tour], 1-LISTE_FACTEURS_PONDERATION[tour]
+    depth = DEPTH + int(hauteur.count(DIM_Y)*FACTEUR_DEPTH)
     
     best_score = -INF
     for x in possibilites:
@@ -39,8 +40,9 @@ def best_mouv(tableau,hauteur):
             else:
                 tableau[x][y] = IA
                 hauteur[x] += 1
-                score = minimax(tableau,hauteur,depth, -INF, INF,evaluate_score_pos(x,y,tableau),False)
+                score = minimax(x,tableau,hauteur,depth, -INF, INF,evaluate_score_pos(x,y,tableau),False)
                 stdout.write("Reflexion... \n")
+                print(x+1,score)
                 hauteur[x] -= 1
                 tableau[x][y] = VIDE
             if score > best_score:
@@ -48,13 +50,11 @@ def best_mouv(tableau,hauteur):
     stdout.write("Coup choisi: "+str(best+1)+" | Score:" +str(best_score)+" | Temps: "+ str(round(time()-debut_tour,3)) +"\n")
     return best
 
-def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
+def minimax(old_x,tableau,hauteur,depth, alpha, beta,valeur,ia):
     # Evaluer le mouvement
-    
-    
 
     #Profondeur maximale
-    if depth <= 0 and time()-debut_tour > TIME_MIN:
+    if depth <= 0 and time() > temps_min:
         return valeur
     
     # Match nul
@@ -63,7 +63,7 @@ def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
     
     if ia:
         score = -INF
-        for x in possibilites:
+        for x in possibilites2[old_x]:
             y = hauteur[x]
             if tableau[x][y] == VIDE:
                 # Coup gagnant
@@ -73,7 +73,7 @@ def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
                 tableau[x][y] = IA
                 hauteur[x] += 1
                 
-                score = max(score,minimax(tableau,hauteur,depth - 1, alpha, beta,valeur + evaluate_score_pos(x,y,tableau), False))
+                score = max(score,minimax(x,tableau,hauteur,depth - 1, alpha, beta,valeur + evaluate_score_pos(x,y,tableau), False))
                 hauteur[x] -= 1
                 tableau[x][y] = VIDE
                 
@@ -84,7 +84,7 @@ def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
         return score
     else:
         score = INF
-        for x in possibilites:
+        for x in possibilites2[old_x]:
             y = hauteur[x]
             if tableau[x][y] == VIDE:
                 # Coup gagnant
@@ -93,7 +93,7 @@ def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
                 tableau[x][y] = JOUEUR
                 hauteur[x] += 1
                 
-                score = min(score,minimax(tableau,hauteur, depth - 1, alpha, beta,valeur - evaluate_score_pos(x,y,tableau), True))
+                score = min(score,minimax(x,tableau,hauteur, depth - 1, alpha, beta,valeur - evaluate_score_pos(x,y,tableau), True))
                 hauteur[x] -= 1
                 tableau[x][y] = VIDE
                 
@@ -106,8 +106,8 @@ def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
 def test_win_pos(x,y,joueur, tableau):
     for d_x,d_y in deltas_inf:
         nb_alignes = 1
-        for op in [1,-1]:
-            for i in range(1,4):
+        for op in OPPOSE:
+            for i in DELTA:
                 n_x, n_y = x+i*op*d_x, y + i*op*d_y
                 if nb_alignes >= 4:
                     return True
@@ -122,23 +122,23 @@ def evaluate_score_pos(x,y,tableau):
     # Est ce que cette position permet a moi ou l'adversaire d'avoir deux ou trois jetons alignés ?
     score_IA,score_JO = 0, 0
     for d_x,d_y in deltas_inf:
-        nb_libre_IA,nb_alignes_IA, continu_IA =1, 1, True
-        nb_libre_JO,nb_alignes_JO, continu_JO =1, 1, True
-        for op in [1,-1]:
-            for i in [1,2,3]:
-                n_x, n_y = x+i*op*d_x, y + i*op*d_y
+        nb_libre_IA,nb_alignes_IA =1, 1
+        nb_libre_JO,nb_alignes_JO =1, 1
+        for op in OPPOSE:
+            continu_IA, continu_JO = True, True
+            for i in DELTA:
                 if continu_IA or continu_JO:
-                    case = tableau[n_x][n_y]
+                    case = tableau[x+i*op*d_x][y + i*op*d_y]
                     if continu_IA and (case == VIDE or case == IA ):
                         nb_libre_IA += 1
                         if case == IA:
-                            nb_alignes_IA += GRILLE_SCORE[n_x][n_y]
+                            nb_alignes_IA += 1
                     else:
                         continu_IA = False
                     if continu_JO and (case == VIDE or case == JOUEUR):
                         nb_libre_JO += 1
                         if case == JOUEUR:
-                            nb_alignes_JO += GRILLE_SCORE[n_x][n_y]
+                            nb_alignes_JO += 1
                     else:
                         continu_JO = False
                 else:
@@ -147,10 +147,7 @@ def evaluate_score_pos(x,y,tableau):
             score_IA = min(3,nb_alignes_IA)
         if nb_libre_JO >= 4 and nb_alignes_JO > 2  and nb_alignes_JO > score_JO:
             score_JO = min(3,nb_alignes_JO)
-    if tableau[x][y] == IA:
-        return score_IA*FACT_POND_MAX + score_JO*FACT_POND_MIN
-    else:
-        return score_IA*FACT_POND_MIN + score_JO*FACT_POND_MAX
+    return score_IA + score_JO
 
 def poser_jeton(x,joueur,hauteur,tableau):
     if tableau[x][hauteur[x]] == VIDE:
