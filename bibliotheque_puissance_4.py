@@ -15,6 +15,7 @@ possibilites = (3,2,4,1,5,0,6)
 
 # Scores:
 GRILLE_SCORE = [[3,4,5,5,4,3],[4,6,8,8,6,4],[5,8,11,11,8,5],[7,10,13,13,10,7],[5,8,11,11,8,5],[4,6,8,8,6,4],[3,4,5,5,4,3]]
+LISTE_FACTEURS_PONDERATION = [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 a, m= DEPTH-1, 13
 for x,y in positions: GRILLE_SCORE[x][y] = (a + GRILLE_SCORE[x][y]/m )/(a+1)
 GRILLE_SCORE = tuple(map(tuple, GRILLE_SCORE))
@@ -22,11 +23,12 @@ WIN = 42*100
 
 def best_mouv(tableau,hauteur):
     # Trouvez le meilleur mouvement
-    global tour, debut_tour
+    global tour, debut_tour, FACT_POND_MAX, FACT_POND_MIN
     tour,debut_tour = sum(hauteur),time()
     stdout.write("Tour IA n°"+ str(tour)+"\n")
-    depth = DEPTH + hauteur.count(DIM_Y)*2
-        
+    depth = DEPTH + int(hauteur.count(DIM_Y)*1.6)
+    FACT_POND_MAX,FACT_POND_MIN = 1+LISTE_FACTEURS_PONDERATION[tour], 1-LISTE_FACTEURS_PONDERATION[tour]
+    
     best_score = -INF
     for x in possibilites:
         y = hauteur[x]
@@ -146,9 +148,9 @@ def evaluate_score_pos(x,y,tableau):
         if nb_libre_JO >= 4 and nb_alignes_JO > 2  and nb_alignes_JO > score_JO:
             score_JO = min(3,nb_alignes_JO)
     if tableau[x][y] == IA:
-        return score_IA + score_JO*0.9
+        return score_IA*FACT_POND_MAX + score_JO*FACT_POND_MIN
     else:
-        return score_IA*0.9 + score_JO
+        return score_IA*FACT_POND_MIN + score_JO*FACT_POND_MAX
 
 def poser_jeton(x,joueur,hauteur,tableau):
     if tableau[x][hauteur[x]] == VIDE:
