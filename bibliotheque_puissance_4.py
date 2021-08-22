@@ -143,9 +143,12 @@ def evaluate_score_pos(x,y,tableau):
                     break
         if nb_libre_IA >= 4 and nb_alignes_IA > 2 and nb_alignes_IA > score_IA:
             score_IA = min(3,nb_alignes_IA)
-        if nb_libre_JO >= 4 and nb_alignes_JO > 2 and nb_alignes_JO > score_JO:
+        if nb_libre_JO >= 4 and nb_alignes_JO > 2  and nb_alignes_JO > score_JO:
             score_JO = min(3,nb_alignes_JO)
-    return score_IA + score_JO
+    if tableau[x][y] == IA:
+        return score_IA + score_JO*0.9
+    else:
+        return score_IA*0.9 + score_JO
 
 def poser_jeton(x,joueur,hauteur,tableau):
     if tableau[x][hauteur[x]] == VIDE:
