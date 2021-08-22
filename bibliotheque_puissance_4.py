@@ -4,7 +4,7 @@ from time import time
 
 global deltas_inf,positions,possibilites,DIM_X,DIM_Y, JOUEUR, IA,INF, DEPTH,NB_CASES,TIME_MIN
 DIM_X, DIM_Y = 7, 6
-JOUEUR, IA,VIDE, BORDURE = "X", "O", " ", "#"
+JOUEUR, IA,VIDE, BORDURE = 'X', 'O', ' ', '#'
 INF = float('inf')
 NB_CASES = DIM_X * DIM_Y
 DEPTH,TIME_MIN = 8, 1.2
@@ -25,10 +25,7 @@ def best_mouv(tableau,hauteur):
     global tour, debut_tour
     tour,debut_tour = sum(hauteur),time()
     stdout.write("Tour IA n°"+ str(tour)+"\n")
-    if tour < DIM_Y:
-        depth = DEPTH
-    else:
-        depth = DEPTH + hauteur.count(DIM_Y)*2
+    depth = DEPTH + hauteur.count(DIM_Y)*2
         
     best_score = -INF
     for x in possibilites:
@@ -130,13 +127,13 @@ def evaluate_score_pos(x,y,tableau):
                 n_x, n_y = x+i*op*d_x, y + i*op*d_y
                 if continu_IA or continu_JO:
                     case = tableau[n_x][n_y]
-                    if continu_IA and (case == IA or case == VIDE):
+                    if continu_IA and (case == VIDE or case == IA ):
                         nb_libre_IA += 1
                         if case == IA:
                             nb_alignes_IA += GRILLE_SCORE[n_x][n_y]
                     else:
                         continu_IA = False
-                    if continu_JO and (case == JOUEUR or case == VIDE):
+                    if continu_JO and (case == VIDE or case == JOUEUR):
                         nb_libre_JO += 1
                         if case == JOUEUR:
                             nb_alignes_JO += GRILLE_SCORE[n_x][n_y]
@@ -149,16 +146,6 @@ def evaluate_score_pos(x,y,tableau):
         if nb_libre_JO >= 4 and nb_alignes_JO > 2 and nb_alignes_JO > score_JO:
             score_JO = min(3,nb_alignes_JO)
     return score_IA + score_JO
-
-def evaluate_score(tableau):
-    score = 0
-    for x, y in positions:
-        joueur = tableau[x][y]
-        if joueur == IA:
-            score += evaluate_score_pos(x,y,tableau)
-        if joueur == JOUEUR:
-            score -= evaluate_score_pos(x,y,tableau)
-    return score
 
 def poser_jeton(x,joueur,hauteur,tableau):
     if tableau[x][hauteur[x]] == VIDE:
@@ -192,9 +179,9 @@ def afficher_jeu(tableau):
         for x in range(DIM_X):
             ligne += tableau[x][y]
             if (x+y)%2 == 0:
-                 ligne += " " #\f
+                ligne += VIDE #\f
             else:
-                ligne += " "
+                ligne += VIDE
         stdout.write("%s\n" %ligne)
     stdout.write("  "+" ".join(map(str,range(1,DIM_X+1)))+"\n")
     
