@@ -42,12 +42,12 @@ def best_mouv(tableau,hauteur):
                 hauteur[x] += 1
                 score = minimax(x,tableau,hauteur,depth, -INF, INF,evaluate_score_pos(x,y,tableau),False)
                 stdout.write("Reflexion... \n")
-                print(x+1,score)
+                #stdout.write(str(x+1)+" "+str(score)+"\n")
                 hauteur[x] -= 1
                 tableau[x][y] = VIDE
             if score > best_score:
                 best_score, best = score, x
-    stdout.write("Coup choisi: "+str(best+1)+" | Score:" +str(best_score)+" | Temps: "+ str(round(time()-debut_tour,3)) +"\n")
+    stdout.write("Coup choisi: "+str(best+1)+"\n")#" | Score:" +str(best_score)+" | Temps: "+ str(round(time()-debut_tour,3)) +"\n")
     return best
 
 def minimax(old_x,tableau,hauteur,depth, alpha, beta,valeur,ia):
