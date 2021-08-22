@@ -51,7 +51,12 @@ def ia_tour():
     
 def main():
     global TABLEAU,HAUTEUR, T, IA, JOUEUR
-    TABLEAU = [[VIDE for y in range(DIM_Y)]+[BORDURE] for x in range(DIM_X)] + [[BORDURE for _ in range(DIM_X+1)]]
+    TABLEAU2 = [[VIDE for y in range(DIM_Y)]+[BORDURE] for x in range(DIM_X)] + [[BORDURE for x in range(DIM_X+1)]]
+    TABLEAU = {}
+    for x in range(-1,DIM_X+1):
+        for y in range(-1,DIM_Y+1):
+            TABLEAU[x,y] = TABLEAU2[x][y]
+            
     HAUTEUR = [0 for x in range(DIM_X+1)]
     
     # Premier au deuxième joueur ?
