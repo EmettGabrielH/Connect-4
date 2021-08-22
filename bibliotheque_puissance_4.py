@@ -34,16 +34,16 @@ def best_mouv(tableau,hauteur):
     for x in possibilites:
         y = hauteur[x]
         
-        if tableau[x,y] == VIDE:
+        if tableau[x][y] == VIDE:
             if test_win_pos(x,y,IA, tableau):
                 score = WIN * depth
             else:
-                tableau[x,y] = IA
+                tableau[x][y] = IA
                 hauteur[x] += 1
                 score = minimax(tableau,hauteur,depth, -INF, INF,evaluate_score_pos(x,y,tableau),False)
                 stdout.write("Reflexion... \n")
                 hauteur[x] -= 1
-                tableau[x,y] = VIDE
+                tableau[x][y] = VIDE
             if score > best_score:
                 best_score, best = score, x
     stdout.write("Coup choisi: "+str(best+1)+" | Score:" +str(best_score)+" | Temps: "+ str(round(time()-debut_tour,3)) +"\n")
@@ -66,17 +66,17 @@ def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
         score = -INF
         for x in possibilites:
             y = hauteur[x]
-            if tableau[x,y] == VIDE:
+            if tableau[x][y] == VIDE:
                 # Coup gagnant
                 if test_win_pos(x,y,IA, tableau):
                     return  WIN * depth
                 
-                tableau[x,y] = IA
+                tableau[x][y] = IA
                 hauteur[x] += 1
                 
                 score = max(score,minimax(tableau,hauteur,depth - 1, alpha, beta,valeur + evaluate_score_pos(x,y,tableau), False))
                 hauteur[x] -= 1
-                tableau[x,y] = VIDE
+                tableau[x][y] = VIDE
                 
                 if score >= beta:
                    return score
@@ -87,16 +87,16 @@ def minimax(tableau,hauteur,depth, alpha, beta,valeur,ia):
         score = INF
         for x in possibilites:
             y = hauteur[x]
-            if tableau[x,y] == VIDE:
+            if tableau[x][y] == VIDE:
                 # Coup gagnant
                 if test_win_pos(x,y,JOUEUR, tableau):
                     return  -WIN * depth
-                tableau[x,y] = JOUEUR
+                tableau[x][y] = JOUEUR
                 hauteur[x] += 1
                 
                 score = min(score,minimax(tableau,hauteur, depth - 1, alpha, beta,valeur - evaluate_score_pos(x,y,tableau), True))
                 hauteur[x] -= 1
-                tableau[x,y] = VIDE
+                tableau[x][y] = VIDE
                 
                 if alpha >= score:
                     return score
@@ -112,7 +112,7 @@ def test_win_pos(x,y,joueur, tableau):
                 n_x, n_y = x+i*op*d_x, y + i*op*d_y
                 if nb_alignes >= 4:
                     return True
-                if tableau[n_x,n_y] != joueur:
+                if tableau[n_x][n_y] != joueur:
                     break
                 nb_alignes += 1
         if nb_alignes >= 4:
@@ -129,7 +129,7 @@ def evaluate_score_pos(x,y,tableau):
             for i in [1,2,3]:
                 n_x, n_y = x+i*op*d_x, y + i*op*d_y
                 if continu_IA or continu_JO:
-                    case = tableau[n_x,n_y]
+                    case = tableau[n_x][n_y]
                     if continu_IA and (case == IA or case == VIDE):
                         nb_libre_IA += 1
                         if case == IA:
@@ -153,7 +153,7 @@ def evaluate_score_pos(x,y,tableau):
 def evaluate_score(tableau):
     score = 0
     for x, y in positions:
-        joueur = tableau[x,y]
+        joueur = tableau[x][y]
         if joueur == IA:
             score += evaluate_score_pos(x,y,tableau)
         if joueur == JOUEUR:
@@ -161,20 +161,20 @@ def evaluate_score(tableau):
     return score
 
 def poser_jeton(x,joueur,hauteur,tableau):
-    if tableau[x,hauteur[x]] == VIDE:
-        tableau[x,hauteur[x]] = joueur
+    if tableau[x][hauteur[x]] == VIDE:
+        tableau[x][hauteur[x]] = joueur
         hauteur[x] += 1
         return True
     return False
 def test_win(tableau):
     for x, y in positions:
-        if tableau[x,y] != VIDE and tableau[x,y] != BORDURE:
-            winner = tableau[x,y]
+        if tableau[x][y] != VIDE and tableau[x][y] != BORDURE:
+            winner = tableau[x][y]
             for d_x,d_y in deltas_inf:
                 win = True
                 for i in range(1,4):
                     n_x, n_y = x+i*d_x, y + i*d_y
-                    if tableau[n_x,n_y] != winner:
+                    if tableau[n_x][n_y] != winner:
                         win = False
                         break
                 if win:
@@ -190,7 +190,7 @@ def afficher_jeu(tableau):
     for y in range(DIM_Y-1,-1,-1):
         ligne = str(y+1)+" "
         for x in range(DIM_X):
-            ligne += tableau[x,y]
+            ligne += tableau[x][y]
             if (x+y)%2 == 0:
                  ligne += " " #\f
             else:
